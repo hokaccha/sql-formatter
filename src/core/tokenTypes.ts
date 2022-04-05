@@ -1,7 +1,7 @@
 /**
  * Constants for token types
  */
-export default {
+export const tokenTypes = {
   WORD: "word",
   STRING: "string",
   RESERVED: "reserved",
@@ -15,4 +15,6 @@ export default {
   BLOCK_COMMENT: "block-comment",
   NUMBER: "number",
   PLACEHOLDER: "placeholder",
-};
+} as const;
+
+export type TokenTypes = typeof tokenTypes[keyof typeof tokenTypes];

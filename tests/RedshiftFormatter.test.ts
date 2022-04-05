@@ -10,7 +10,8 @@ import supportsSchema from "./features/schema";
 import supportsStrings from "./features/strings";
 
 describe("RedshiftFormatter", () => {
-  const format = (query, cfg = {}) => sqlFormatter.format(query, { ...cfg, language: "redshift" });
+  const format = (query: string, cfg = {}) =>
+    sqlFormatter.format(query, { ...cfg, language: "redshift" });
 
   behavesLikeSqlFormatter(format);
   supportsCreateTable(format);
@@ -18,11 +19,25 @@ describe("RedshiftFormatter", () => {
   supportsAlterTableModify(format);
   supportsStrings(format, ['""', "''", "``"]);
   supportsSchema(format);
-  supportsOperators(format, ["%", "^", "|/", "||/", "<<", ">>", "&", "|", "~", "!", "!=", "||"]);
+  supportsOperators(format, [
+    "%",
+    "^",
+    "|/",
+    "||/",
+    "<<",
+    ">>",
+    "&",
+    "|",
+    "~",
+    "!",
+    "!=",
+    "||",
+  ]);
   supportsJoin(format);
 
   it("formats LIMIT", () => {
-    expect(format("SELECT col1 FROM tbl ORDER BY col2 DESC LIMIT 10;")).toBe(dedent`
+    expect(format("SELECT col1 FROM tbl ORDER BY col2 DESC LIMIT 10;"))
+      .toBe(dedent`
       SELECT
         col1
       FROM

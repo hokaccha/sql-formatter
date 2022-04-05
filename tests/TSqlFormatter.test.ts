@@ -11,7 +11,8 @@ import supportsSchema from "./features/schema";
 import supportsStrings from "./features/strings";
 
 describe("TSqlFormatter", () => {
-  const format = (query, cfg = {}) => sqlFormatter.format(query, { ...cfg, language: "tsql" });
+  const format = (query: string, cfg = {}) =>
+    sqlFormatter.format(query, { ...cfg, language: "tsql" });
 
   behavesLikeSqlFormatter(format);
   supportsCase(format);
@@ -39,7 +40,6 @@ describe("TSqlFormatter", () => {
     "^=",
     "::",
   ]);
-  // @ts-expect-error
   supportsJoin(format, { without: ["NATURAL"] });
 
   // TODO: The following are duplicated from StandardSQLFormatter test

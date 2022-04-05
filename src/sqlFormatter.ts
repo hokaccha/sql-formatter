@@ -1,3 +1,4 @@
+import type { PlaceholderParams } from "./core/Params";
 import Db2Formatter from "./languages/Db2Formatter";
 import MariaDbFormatter from "./languages/MariaDbFormatter";
 import MySqlFormatter from "./languages/MySqlFormatter";
@@ -8,6 +9,8 @@ import RedshiftFormatter from "./languages/RedshiftFormatter";
 import SparkSqlFormatter from "./languages/SparkSqlFormatter";
 import StandardSqlFormatter from "./languages/StandardSqlFormatter";
 import TSqlFormatter from "./languages/TSqlFormatter";
+
+const DEFAULT_LANGUAGE = "sql";
 
 const formatters = {
   db2: Db2Formatter,
@@ -20,6 +23,14 @@ const formatters = {
   spark: SparkSqlFormatter,
   sql: StandardSqlFormatter,
   tsql: TSqlFormatter,
+} as const;
+
+export type FormatConfig = {
+  language?: keyof typeof formatters;
+  indent?: string;
+  uppercase?: boolean;
+  linesBetweenQueries?: number;
+  params?: PlaceholderParams;
 };
 
 /**
@@ -34,22 +45,19 @@ const formatters = {
  *  @param {Object} cfg.params Collection of params for placeholder replacement
  * @return {String}
  */
-export const format = (query, cfg = {}) => {
+export const format = (query: string, config: FormatConfig = {}) => {
   if (typeof query !== "string") {
-    throw new Error("Invalid query argument. Expected string, instead got " + typeof query);
+    throw new Error(
+      "Invalid query argument. Expected string, instead got " + typeof query
+    );
   }
 
-  let Formatter = StandardSqlFormatter;
-  // @ts-expect-error
-  if (cfg.language !== undefined) {
-    // @ts-expect-error
-    Formatter = formatters[cfg.language];
-  }
+  const { language, ...formatterConfig } = config;
+  const Formatter = formatters[language || DEFAULT_LANGUAGE];
   if (Formatter === undefined) {
-    // @ts-expect-error
-    throw Error(`Unsupported SQL dialect: ${cfg.language}`);
+    throw Error(`Unsupported SQL dialect: ${language}`);
   }
-  return new Formatter(cfg).format(query);
+  return new Formatter(formatterConfig).format(query);
 };
 
 export const supportedDialects = Object.keys(formatters);

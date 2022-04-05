@@ -12,7 +12,8 @@ import supportsSchema from "./features/schema";
 import supportsStrings from "./features/strings";
 
 describe("PlSqlFormatter", () => {
-  const format = (query, cfg = {}) => sqlFormatter.format(query, { ...cfg, language: "plsql" });
+  const format = (query: string, cfg = {}) =>
+    sqlFormatter.format(query, { ...cfg, language: "plsql" });
 
   behavesLikeSqlFormatter(format);
   supportsCase(format);
@@ -26,7 +27,11 @@ describe("PlSqlFormatter", () => {
   supportsJoin(format);
 
   it("formats FETCH FIRST like LIMIT", () => {
-    expect(format("SELECT col1 FROM tbl ORDER BY col2 DESC FETCH FIRST 20 ROWS ONLY;")).toBe(dedent`
+    expect(
+      format(
+        "SELECT col1 FROM tbl ORDER BY col2 DESC FETCH FIRST 20 ROWS ONLY;"
+      )
+    ).toBe(dedent`
       SELECT
         col1
       FROM

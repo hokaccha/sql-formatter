@@ -11,7 +11,8 @@ import supportsSchema from "./features/schema";
 import supportsStrings from "./features/strings";
 
 describe("SparkSqlFormatter", () => {
-  const format = (query, cfg = {}) => sqlFormatter.format(query, { ...cfg, language: "spark" });
+  const format = (query: string, cfg = {}) =>
+    sqlFormatter.format(query, { ...cfg, language: "spark" });
 
   behavesLikeSqlFormatter(format);
   supportsCase(format);
@@ -20,8 +21,20 @@ describe("SparkSqlFormatter", () => {
   supportsStrings(format, ['""', "''", "``"]);
   supportsBetween(format);
   supportsSchema(format);
-  supportsOperators(format, ["!=", "%", "|", "&", "^", "~", "!", "<=>", "%", "&&", "||", "=="]);
-  // @ts-expect-error
+  supportsOperators(format, [
+    "!=",
+    "%",
+    "|",
+    "&",
+    "^",
+    "~",
+    "!",
+    "<=>",
+    "%",
+    "&&",
+    "||",
+    "==",
+  ]);
   supportsJoin(format, {
     additionally: [
       "ANTI JOIN",

@@ -3,7 +3,8 @@ import behavesLikeMariaDbFormatter from "./behavesLikeMariaDbFormatter";
 import supportsOperators from "./features/operators";
 
 describe("MySqlFormatter", () => {
-  const format = (query, cfg = {}) => sqlFormatter.format(query, { ...cfg, language: "mysql" });
+  const format = (query: string, cfg = {}) =>
+    sqlFormatter.format(query, { ...cfg, language: "mysql" });
 
   behavesLikeMariaDbFormatter(format);
 

@@ -1,10 +1,11 @@
 import dedent from "dedent-js";
+import type { Format } from "../helpers/types";
 
 /**
  * Tests for standard -- and /* *\/ comments
  * @param {Function} format
  */
-export default function supportsComments(format) {
+export default function supportsComments(format: Format) {
   it("formats SELECT query with different comments", () => {
     const result = format(dedent`
       SELECT
@@ -101,8 +102,12 @@ export default function supportsComments(format) {
   });
 
   it("recognizes line-comments with Windows line-endings (converts them to UNIX)", () => {
-    const result = format("SELECT * FROM\r\n-- line comment 1\r\nMyTable -- line comment 2\r\n");
-    expect(result).toBe("SELECT\n  *\nFROM\n  -- line comment 1\n  MyTable -- line comment 2");
+    const result = format(
+      "SELECT * FROM\r\n-- line comment 1\r\nMyTable -- line comment 2\r\n"
+    );
+    expect(result).toBe(
+      "SELECT\n  *\nFROM\n  -- line comment 1\n  MyTable -- line comment 2"
+    );
   });
 
   it("formats query that ends with open comment", () => {

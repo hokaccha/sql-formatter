@@ -1,14 +1,17 @@
+import type { Token } from "./token";
+
+export type PlaceholderParams = Record<string, string> | Array<string>;
 /**
  * Handles placeholder replacement with given params.
  */
 export default class Params {
-  params: any;
+  params?: PlaceholderParams;
   index: number;
 
   /**
    * @param {Object} params
    */
-  constructor(params) {
+  constructor(params?: PlaceholderParams) {
     this.params = params;
     this.index = 0;
   }
@@ -20,13 +23,19 @@ export default class Params {
    *   @param {String} token.value Placeholder value
    * @return {String} param or token.value when params are missing
    */
-  get({ key, value }) {
+  get(token: Token): string {
     if (!this.params) {
-      return value;
+      return token.value;
     }
-    if (key) {
-      return this.params[key];
+
+    if (Array.isArray(this.params)) {
+      return this.params[this.index++];
     }
-    return this.params[this.index++];
+
+    if (token.key) {
+      return this.params[token.key];
+    }
+
+    throw new Error("Invalid params");
   }
 }

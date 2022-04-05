@@ -1,10 +1,11 @@
 import dedent from "dedent-js";
+import type { Format } from "../helpers/types";
 
 /**
  * Tests support for CASE [WHEN...] END syntax
  * @param {Function} format
  */
-export default function supportsCase(format) {
+export default function supportsCase(format: Format) {
   it("formats CASE ... WHEN with a blank expression", () => {
     const result = format(
       "CASE WHEN option = 'foo' THEN 1 WHEN option = 'bar' THEN 2 WHEN option = 'baz' THEN 3 ELSE 4 END;"
@@ -37,7 +38,9 @@ export default function supportsCase(format) {
   });
 
   it("formats CASE ... WHEN inside SELECT", () => {
-    const result = format("SELECT foo, bar, CASE baz WHEN 'one' THEN 1 WHEN 'two' THEN 2 ELSE 3 END FROM table");
+    const result = format(
+      "SELECT foo, bar, CASE baz WHEN 'one' THEN 1 WHEN 'two' THEN 2 ELSE 3 END FROM table"
+    );
 
     expect(result).toBe(dedent`
       SELECT

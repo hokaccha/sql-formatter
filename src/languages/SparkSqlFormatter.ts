@@ -1,7 +1,8 @@
 import Formatter from "../core/Formatter";
 import Tokenizer from "../core/Tokenizer";
+import type { Token } from "../core/token";
 import { isEnd, isWindow } from "../core/token";
-import tokenTypes from "../core/tokenTypes";
+import { tokenTypes } from "../core/tokenTypes";
 
 const reservedWords = [
   "ALL",
@@ -183,7 +184,14 @@ const reservedTopLevelWords = [
   "WINDOW",
 ];
 
-const reservedTopLevelWordsNoIndent = ["EXCEPT ALL", "EXCEPT", "INTERSECT ALL", "INTERSECT", "UNION ALL", "UNION"];
+const reservedTopLevelWordsNoIndent = [
+  "EXCEPT ALL",
+  "EXCEPT",
+  "INTERSECT ALL",
+  "INTERSECT",
+  "UNION ALL",
+  "UNION",
+];
 
 const reservedNewlineWords = [
   "AND",
@@ -242,22 +250,34 @@ export default class SparkSqlFormatter extends Formatter {
     });
   }
 
-  tokenOverride(token) {
+  tokenOverride(token: Token): Token {
     // Fix cases where names are ambiguously keywords or functions
     if (isWindow(token)) {
       const aheadToken = this.tokenLookAhead();
       if (aheadToken && aheadToken.type === tokenTypes.OPEN_PAREN) {
         // This is a function call, treat it as a reserved word
-        return { type: tokenTypes.RESERVED, value: token.value };
+        return {
+          type: tokenTypes.RESERVED,
+          value: token.value,
+          whitespaceBefore: "",
+        };
       }
     }
 
     // Fix cases where names are ambiguously keywords or properties
     if (isEnd(token)) {
       const backToken = this.tokenLookBehind();
-      if (backToken && backToken.type === tokenTypes.OPERATOR && backToken.value === ".") {
+      if (
+        backToken &&
+        backToken.type === tokenTypes.OPERATOR &&
+        backToken.value === "."
+      ) {
         // This is window().end (or similar) not CASE ... END
-        return { type: tokenTypes.WORD, value: token.value };
+        return {
+          type: tokenTypes.WORD,
+          value: token.value,
+          whitespaceBefore: "",
+        };
       }
     }
 

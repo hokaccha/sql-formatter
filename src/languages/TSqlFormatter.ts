@@ -213,7 +213,13 @@ const reservedTopLevelWords = [
   "WHERE",
 ];
 
-const reservedTopLevelWordsNoIndent = ["INTERSECT", "INTERSECT ALL", "MINUS", "UNION", "UNION ALL"];
+const reservedTopLevelWordsNoIndent = [
+  "INTERSECT",
+  "INTERSECT ALL",
+  "MINUS",
+  "UNION",
+  "UNION ALL",
+];
 
 const reservedNewlineWords = [
   "AND",
@@ -246,7 +252,23 @@ export default class TSqlFormatter extends Formatter {
       namedPlaceholderTypes: ["@"],
       lineCommentTypes: ["--"],
       specialWordChars: ["#", "@"],
-      operators: [">=", "<=", "<>", "!=", "!<", "!>", "+=", "-=", "*=", "/=", "%=", "|=", "&=", "^=", "::"],
+      operators: [
+        ">=",
+        "<=",
+        "<>",
+        "!=",
+        "!<",
+        "!>",
+        "+=",
+        "-=",
+        "*=",
+        "/=",
+        "%=",
+        "|=",
+        "&=",
+        "^=",
+        "::",
+      ],
       // TODO: Support for money constants
     });
   }

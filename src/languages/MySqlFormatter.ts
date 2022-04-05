@@ -285,7 +285,12 @@ const reservedTopLevelWords = [
   "WHERE",
 ];
 
-const reservedTopLevelWordsNoIndent = ["INTERSECT", "INTERSECT ALL", "UNION", "UNION ALL"];
+const reservedTopLevelWordsNoIndent = [
+  "INTERSECT",
+  "INTERSECT ALL",
+  "UNION",
+  "UNION ALL",
+];
 
 const reservedNewlineWords = [
   "AND",

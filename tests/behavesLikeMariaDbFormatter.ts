@@ -7,19 +7,34 @@ import supportsCreateTable from "./features/createTable";
 import supportsJoin from "./features/join";
 import supportsOperators from "./features/operators";
 import supportsStrings from "./features/strings";
+import type { Format } from "./helpers/types";
 
 /**
  * Shared tests for MySQL and MariaDB
  * @param {Function} format
  */
-export default function behavesLikeMariaDbFormatter(format) {
+export default function behavesLikeMariaDbFormatter(format: Format) {
   behavesLikeSqlFormatter(format);
   supportsCase(format);
   supportsCreateTable(format);
   supportsAlterTable(format);
   supportsStrings(format, ['""', "''", "``"]);
   supportsBetween(format);
-  supportsOperators(format, ["%", "&", "|", "^", "~", "!=", "!", "<=>", "<<", ">>", "&&", "||", ":="]);
+  supportsOperators(format, [
+    "%",
+    "&",
+    "|",
+    "^",
+    "~",
+    "!=",
+    "!",
+    "<=>",
+    "<<",
+    ">>",
+    "&&",
+    "||",
+    ":=",
+  ]);
   supportsJoin(format, {
     without: ["FULL"],
     additionally: [

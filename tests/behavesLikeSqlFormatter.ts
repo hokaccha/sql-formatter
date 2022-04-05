@@ -2,15 +2,27 @@ import dedent from "dedent-js";
 import supportsComments from "./features/comments";
 import supportsConfigOptions from "./features/configOptions";
 import supportsOperators from "./features/operators";
+import type { Format } from "./helpers/types";
 
 /**
  * Core tests for all SQL formatters
  * @param {Function} format
  */
-export default function behavesLikeSqlFormatter(format) {
+export default function behavesLikeSqlFormatter(format: Format) {
   supportsComments(format);
   supportsConfigOptions(format);
-  supportsOperators(["=", "+", "-", "*", "/", "<>", ">", "<", ">=", "<="]);
+  supportsOperators(format, [
+    "=",
+    "+",
+    "-",
+    "*",
+    "/",
+    "<>",
+    ">",
+    "<",
+    ">=",
+    "<=",
+  ]);
 
   it("does nothing with empty input", () => {
     const result = format("");
@@ -19,7 +31,10 @@ export default function behavesLikeSqlFormatter(format) {
   });
 
   it("throws error when query argument is not string", () => {
-    expect(() => format(undefined)).toThrow("Invalid query argument. Expected string, instead got undefined");
+    // @ts-expect-error for testing
+    expect(() => format(undefined)).toThrow(
+      "Invalid query argument. Expected string, instead got undefined"
+    );
   });
 
   it("formats lonely semicolon", () => {
@@ -38,7 +53,9 @@ export default function behavesLikeSqlFormatter(format) {
   });
 
   it("formats complex SELECT", () => {
-    const result = format("SELECT DISTINCT name, ROUND(age/7) field1, 18 + 20 AS field2, 'some string' FROM foo;");
+    const result = format(
+      "SELECT DISTINCT name, ROUND(age/7) field1, 18 + 20 AS field2, 'some string' FROM foo;"
+    );
     expect(result).toBe(dedent`
       SELECT
         DISTINCT name,
@@ -143,7 +160,9 @@ export default function behavesLikeSqlFormatter(format) {
   });
 
   it("formats SELECT query with SELECT query inside it", () => {
-    const result = format("SELECT *, SUM(*) AS sum FROM (SELECT * FROM Posts LIMIT 30) WHERE a > b");
+    const result = format(
+      "SELECT *, SUM(*) AS sum FROM (SELECT * FROM Posts LIMIT 30) WHERE a > b"
+    );
     expect(result).toBe(dedent`
       SELECT
         *,
@@ -175,7 +194,9 @@ export default function behavesLikeSqlFormatter(format) {
   });
 
   it("formats open paren after comma", () => {
-    const result = format("WITH TestIds AS (VALUES (4),(5), (6),(7),(9),(10),(11)) SELECT * FROM TestIds;");
+    const result = format(
+      "WITH TestIds AS (VALUES (4),(5), (6),(7),(9),(10),(11)) SELECT * FROM TestIds;"
+    );
     expect(result).toBe(dedent/* sql */ `
       WITH TestIds AS (
         VALUES
@@ -250,7 +271,9 @@ export default function behavesLikeSqlFormatter(format) {
   });
 
   it("formats simple DELETE query", () => {
-    const result = format("DELETE FROM Customers WHERE CustomerName='Alfred' AND Phone=5002132;");
+    const result = format(
+      "DELETE FROM Customers WHERE CustomerName='Alfred' AND Phone=5002132;"
+    );
     expect(result).toBe(dedent`
       DELETE FROM
         Customers
@@ -293,7 +316,9 @@ export default function behavesLikeSqlFormatter(format) {
   });
 
   it("formats top-level and newline multi-word reserved words with inconsistent spacing", () => {
-    const result = format("SELECT * FROM foo LEFT \t   \n JOIN bar ORDER \n BY blah");
+    const result = format(
+      "SELECT * FROM foo LEFT \t   \n JOIN bar ORDER \n BY blah"
+    );
     expect(result).toBe(dedent`
       SELECT
         *
@@ -306,7 +331,9 @@ export default function behavesLikeSqlFormatter(format) {
   });
 
   it("formats long double parenthized queries to multiple lines", () => {
-    const result = format("((foo = '0123456789-0123456789-0123456789-0123456789'))");
+    const result = format(
+      "((foo = '0123456789-0123456789-0123456789-0123456789'))"
+    );
     expect(result).toBe(dedent`
       (
         (
@@ -389,7 +416,9 @@ export default function behavesLikeSqlFormatter(format) {
   });
 
   it("correctly handles floats as single tokens", () => {
-    const result = format("SELECT 1e-9 AS a, 1.5e-10 AS b, 3.5E12 AS c, 3.5e12 AS d;");
+    const result = format(
+      "SELECT 1e-9 AS a, 1.5e-10 AS b, 3.5E12 AS c, 3.5e12 AS d;"
+    );
     expect(result).toBe(dedent`
       SELECT
         1e-9 AS a,

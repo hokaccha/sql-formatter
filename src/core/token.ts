@@ -1,6 +1,15 @@
-import tokenTypes from "./tokenTypes";
+import type { TokenTypes } from "./tokenTypes";
+import { tokenTypes } from "./tokenTypes";
 
-const isToken = (type, regex) => (token) => token?.type === type && regex.test(token?.value);
+export type Token = {
+  type: TokenTypes;
+  value: string;
+  key?: string;
+  whitespaceBefore: string;
+};
+
+const isToken = (type: TokenTypes, regex: RegExp) => (token: Token) =>
+  token?.type === type && regex.test(token?.value);
 
 export const isAnd = isToken(tokenTypes.RESERVED_NEWLINE, /^AND$/iu);
 

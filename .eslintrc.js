@@ -4,7 +4,12 @@ module.exports = {
     node: true,
     es2020: true,
   },
-  extends: ["eslint:recommended", "plugin:import/recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+  extends: [
+    "eslint:recommended",
+    "plugin:import/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+  ],
   settings: {
     "import/resolver": {
       typescript: {
@@ -30,7 +35,7 @@ module.exports = {
     eqeqeq: ["error", "allow-null"],
     "prefer-const": "error",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/consistent-type-imports": "error",
     "import/order": [
       "error",

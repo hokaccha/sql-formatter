@@ -1,4 +1,5 @@
 import dedent from "dedent-js";
+import type { Format } from "../helpers/types";
 
 /**
  * Tests support for various joins
@@ -7,10 +8,20 @@ import dedent from "dedent-js";
  * @param {String[]} opts.without
  * @param {String[]} opts.additionally
  */
-// @ts-expect-error
-export default function supportsJoin(format, { without, additionally } = {}) {
-  const unsupportedJoinRegex = without ? new RegExp(without.join("|"), "u") : /^whateve_!%&$/u;
-  const isSupportedJoin = (join) => !unsupportedJoinRegex.test(join);
+export default function supportsJoin(
+  format: Format,
+  {
+    without,
+    additionally,
+  }: {
+    without?: string[];
+    additionally?: string[];
+  } = {}
+) {
+  const unsupportedJoinRegex = without
+    ? new RegExp(without.join("|"), "u")
+    : /^whateve_!%&$/u;
+  const isSupportedJoin = (join: string) => !unsupportedJoinRegex.test(join);
 
   ["CROSS JOIN", "NATURAL JOIN"].filter(isSupportedJoin).forEach((join) => {
     it(`supports ${join}`, () => {

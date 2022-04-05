@@ -1,6 +1,25 @@
 import { escapeRegExp } from "../utils";
 import * as regexFactory from "./regexFactory";
-import tokenTypes from "./tokenTypes";
+import type { Token } from "./token";
+import type { TokenTypes } from "./tokenTypes";
+import { tokenTypes } from "./tokenTypes";
+
+type ProcessingToken = Omit<Token, "whitespaceBefore"> | null;
+
+type TokenizerConfig = {
+  reservedWords?: string[];
+  reservedTopLevelWords?: string[];
+  reservedNewlineWords?: string[];
+  reservedTopLevelWordsNoIndent?: string[];
+  stringTypes?: string[];
+  openParens?: string[];
+  closeParens?: string[];
+  indexedPlaceholderTypes?: string[];
+  namedPlaceholderTypes?: string[];
+  lineCommentTypes?: string[];
+  specialWordChars?: string[];
+  operators?: string[];
+};
 
 export default class Tokenizer {
   WHITESPACE_REGEX: RegExp;
@@ -16,9 +35,9 @@ export default class Tokenizer {
   STRING_REGEX: RegExp;
   OPEN_PAREN_REGEX: RegExp;
   CLOSE_PAREN_REGEX: RegExp;
-  INDEXED_PLACEHOLDER_REGEX: RegExp;
-  IDENT_NAMED_PLACEHOLDER_REGEX: RegExp;
-  STRING_NAMED_PLACEHOLDER_REGEX: RegExp;
+  INDEXED_PLACEHOLDER_REGEX: RegExp | null;
+  IDENT_NAMED_PLACEHOLDER_REGEX: RegExp | null;
+  STRING_NAMED_PLACEHOLDER_REGEX: RegExp | null;
 
   /**
    * @param {Object} cfg
@@ -35,37 +54,56 @@ export default class Tokenizer {
    *  @param {String[]} cfg.specialWordChars Special chars that can be found inside of words, like @ and #
    *  @param {String[]} [cfg.operator] Additional operators to recognize
    */
-  constructor(cfg) {
+  constructor(cfg: TokenizerConfig) {
     this.WHITESPACE_REGEX = /^(\s+)/u;
-    this.NUMBER_REGEX = /^((-\s*)?[0-9]+(\.[0-9]+)?([eE]-?[0-9]+(\.[0-9]+)?)?|0x[0-9a-fA-F]+|0b[01]+)\b/u;
+    this.NUMBER_REGEX =
+      /^((-\s*)?[0-9]+(\.[0-9]+)?([eE]-?[0-9]+(\.[0-9]+)?)?|0x[0-9a-fA-F]+|0b[01]+)\b/u;
 
-    this.OPERATOR_REGEX = regexFactory.createOperatorRegex(["<>", "<=", ">=", ...(cfg.operators || [])]);
+    this.OPERATOR_REGEX = regexFactory.createOperatorRegex([
+      "<>",
+      "<=",
+      ">=",
+      ...(cfg.operators || []),
+    ]);
 
     this.BLOCK_COMMENT_REGEX = /^(\/\*[^]*?(?:\*\/|$))/u;
-    this.LINE_COMMENT_REGEX = regexFactory.createLineCommentRegex(cfg.lineCommentTypes);
+    this.LINE_COMMENT_REGEX = regexFactory.createLineCommentRegex(
+      cfg.lineCommentTypes || []
+    );
 
-    this.RESERVED_TOP_LEVEL_REGEX = regexFactory.createReservedWordRegex(cfg.reservedTopLevelWords);
-    this.RESERVED_TOP_LEVEL_NO_INDENT_REGEX = regexFactory.createReservedWordRegex(cfg.reservedTopLevelWordsNoIndent);
-    this.RESERVED_NEWLINE_REGEX = regexFactory.createReservedWordRegex(cfg.reservedNewlineWords);
-    this.RESERVED_PLAIN_REGEX = regexFactory.createReservedWordRegex(cfg.reservedWords);
+    this.RESERVED_TOP_LEVEL_REGEX = regexFactory.createReservedWordRegex(
+      cfg.reservedTopLevelWords || []
+    );
+    this.RESERVED_TOP_LEVEL_NO_INDENT_REGEX =
+      regexFactory.createReservedWordRegex(
+        cfg.reservedTopLevelWordsNoIndent || []
+      );
+    this.RESERVED_NEWLINE_REGEX = regexFactory.createReservedWordRegex(
+      cfg.reservedNewlineWords || []
+    );
+    this.RESERVED_PLAIN_REGEX = regexFactory.createReservedWordRegex(
+      cfg.reservedWords || []
+    );
 
     this.WORD_REGEX = regexFactory.createWordRegex(cfg.specialWordChars);
-    this.STRING_REGEX = regexFactory.createStringRegex(cfg.stringTypes);
+    this.STRING_REGEX = regexFactory.createStringRegex(cfg.stringTypes || []);
 
-    this.OPEN_PAREN_REGEX = regexFactory.createParenRegex(cfg.openParens);
-    this.CLOSE_PAREN_REGEX = regexFactory.createParenRegex(cfg.closeParens);
+    this.OPEN_PAREN_REGEX = regexFactory.createParenRegex(cfg.openParens || []);
+    this.CLOSE_PAREN_REGEX = regexFactory.createParenRegex(
+      cfg.closeParens || []
+    );
 
-    // @ts-expect-error
-    this.INDEXED_PLACEHOLDER_REGEX = regexFactory.createPlaceholderRegex(cfg.indexedPlaceholderTypes, "[0-9]*");
-    // @ts-expect-error
+    this.INDEXED_PLACEHOLDER_REGEX = regexFactory.createPlaceholderRegex(
+      cfg.indexedPlaceholderTypes || [],
+      "[0-9]*"
+    );
     this.IDENT_NAMED_PLACEHOLDER_REGEX = regexFactory.createPlaceholderRegex(
-      cfg.namedPlaceholderTypes,
+      cfg.namedPlaceholderTypes || [],
       "[a-zA-Z0-9._$]+"
     );
-    // @ts-expect-error
     this.STRING_NAMED_PLACEHOLDER_REGEX = regexFactory.createPlaceholderRegex(
-      cfg.namedPlaceholderTypes,
-      regexFactory.createStringPattern(cfg.stringTypes)
+      cfg.namedPlaceholderTypes || [],
+      regexFactory.createStringPattern(cfg.stringTypes || [])
     );
   }
 
@@ -79,9 +117,9 @@ export default class Tokenizer {
    *  @return {String} token.value
    *  @return {String} token.whitespaceBefore Preceding whitespace
    */
-  tokenize(input) {
-    const tokens = [];
-    let token;
+  tokenize(input: string): Token[] {
+    const tokens: Token[] = [];
+    let token: ProcessingToken = null;
 
     // Keep processing the string until it is empty
     while (input.length) {
@@ -92,6 +130,8 @@ export default class Tokenizer {
       if (input.length) {
         // Get the next token and the token type
         token = this.getNextToken(input, token);
+        if (token == null) continue;
+
         // Advance the string
         input = input.substring(token.value.length);
 
@@ -101,12 +141,12 @@ export default class Tokenizer {
     return tokens;
   }
 
-  getWhitespace(input) {
+  getWhitespace(input: string): string {
     const matches = input.match(this.WHITESPACE_REGEX);
     return matches ? matches[1] : "";
   }
 
-  getNextToken(input, previousToken) {
+  getNextToken(input: string, previousToken: ProcessingToken): ProcessingToken {
     return (
       this.getCommentToken(input) ||
       this.getStringToken(input) ||
@@ -120,11 +160,11 @@ export default class Tokenizer {
     );
   }
 
-  getCommentToken(input) {
+  getCommentToken(input: string): ProcessingToken {
     return this.getLineCommentToken(input) || this.getBlockCommentToken(input);
   }
 
-  getLineCommentToken(input) {
+  getLineCommentToken(input: string): ProcessingToken {
     return this.getTokenOnFirstMatch({
       input,
       type: tokenTypes.LINE_COMMENT,
@@ -132,7 +172,7 @@ export default class Tokenizer {
     });
   }
 
-  getBlockCommentToken(input) {
+  getBlockCommentToken(input: string): ProcessingToken {
     return this.getTokenOnFirstMatch({
       input,
       type: tokenTypes.BLOCK_COMMENT,
@@ -140,7 +180,7 @@ export default class Tokenizer {
     });
   }
 
-  getStringToken(input) {
+  getStringToken(input: string): ProcessingToken {
     return this.getTokenOnFirstMatch({
       input,
       type: tokenTypes.STRING,
@@ -148,7 +188,7 @@ export default class Tokenizer {
     });
   }
 
-  getOpenParenToken(input) {
+  getOpenParenToken(input: string): ProcessingToken {
     return this.getTokenOnFirstMatch({
       input,
       type: tokenTypes.OPEN_PAREN,
@@ -156,7 +196,7 @@ export default class Tokenizer {
     });
   }
 
-  getCloseParenToken(input) {
+  getCloseParenToken(input: string): ProcessingToken {
     return this.getTokenOnFirstMatch({
       input,
       type: tokenTypes.CLOSE_PAREN,
@@ -164,7 +204,7 @@ export default class Tokenizer {
     });
   }
 
-  getPlaceholderToken(input) {
+  getPlaceholderToken(input: string): ProcessingToken {
     return (
       this.getIdentNamedPlaceholderToken(input) ||
       this.getStringNamedPlaceholderToken(input) ||
@@ -172,7 +212,7 @@ export default class Tokenizer {
     );
   }
 
-  getIdentNamedPlaceholderToken(input) {
+  getIdentNamedPlaceholderToken(input: string): ProcessingToken {
     return this.getPlaceholderTokenWithKey({
       input,
       regex: this.IDENT_NAMED_PLACEHOLDER_REGEX,
@@ -180,15 +220,19 @@ export default class Tokenizer {
     });
   }
 
-  getStringNamedPlaceholderToken(input) {
+  getStringNamedPlaceholderToken(input: string): ProcessingToken {
     return this.getPlaceholderTokenWithKey({
       input,
       regex: this.STRING_NAMED_PLACEHOLDER_REGEX,
-      parseKey: (v) => this.getEscapedPlaceholderKey({ key: v.slice(2, -1), quoteChar: v.slice(-1) }),
+      parseKey: (v) =>
+        this.getEscapedPlaceholderKey({
+          key: v.slice(2, -1),
+          quoteChar: v.slice(-1),
+        }),
     });
   }
 
-  getIndexedPlaceholderToken(input) {
+  getIndexedPlaceholderToken(input: string): ProcessingToken {
     return this.getPlaceholderTokenWithKey({
       input,
       regex: this.INDEXED_PLACEHOLDER_REGEX,
@@ -196,21 +240,41 @@ export default class Tokenizer {
     });
   }
 
-  getPlaceholderTokenWithKey({ input, regex, parseKey }) {
-    const token = this.getTokenOnFirstMatch({ input, regex, type: tokenTypes.PLACEHOLDER });
+  getPlaceholderTokenWithKey({
+    input,
+    regex,
+    parseKey,
+  }: {
+    input: string;
+    regex: RegExp | null;
+    parseKey: (v: string) => string;
+  }): ProcessingToken {
+    const token = this.getTokenOnFirstMatch({
+      input,
+      regex,
+      type: tokenTypes.PLACEHOLDER,
+    });
     if (token) {
-      // @ts-expect-error
       token.key = parseKey(token.value);
     }
     return token;
   }
 
-  getEscapedPlaceholderKey({ key, quoteChar }) {
-    return key.replace(new RegExp(escapeRegExp("\\" + quoteChar), "gu"), quoteChar);
+  getEscapedPlaceholderKey({
+    key,
+    quoteChar,
+  }: {
+    key: string;
+    quoteChar: string;
+  }): string {
+    return key.replace(
+      new RegExp(escapeRegExp("\\" + quoteChar), "gu"),
+      quoteChar
+    );
   }
 
   // Decimal, binary, or hex numbers
-  getNumberToken(input) {
+  getNumberToken(input: string): ProcessingToken {
     return this.getTokenOnFirstMatch({
       input,
       type: tokenTypes.NUMBER,
@@ -219,7 +283,7 @@ export default class Tokenizer {
   }
 
   // Punctuation and symbols
-  getOperatorToken(input) {
+  getOperatorToken(input: string): ProcessingToken {
     return this.getTokenOnFirstMatch({
       input,
       type: tokenTypes.OPERATOR,
@@ -227,11 +291,14 @@ export default class Tokenizer {
     });
   }
 
-  getReservedWordToken(input, previousToken) {
+  getReservedWordToken(
+    input: string,
+    previousToken: ProcessingToken
+  ): ProcessingToken {
     // A reserved word cannot be preceded by a "."
     // this makes it so in "mytable.from", "from" is not considered a reserved word
     if (previousToken && previousToken.value && previousToken.value === ".") {
-      return undefined;
+      return null;
     }
     return (
       this.getTopLevelReservedToken(input) ||
@@ -241,7 +308,7 @@ export default class Tokenizer {
     );
   }
 
-  getTopLevelReservedToken(input) {
+  getTopLevelReservedToken(input: string): ProcessingToken {
     return this.getTokenOnFirstMatch({
       input,
       type: tokenTypes.RESERVED_TOP_LEVEL,
@@ -249,7 +316,7 @@ export default class Tokenizer {
     });
   }
 
-  getNewlineReservedToken(input) {
+  getNewlineReservedToken(input: string): ProcessingToken {
     return this.getTokenOnFirstMatch({
       input,
       type: tokenTypes.RESERVED_NEWLINE,
@@ -257,7 +324,7 @@ export default class Tokenizer {
     });
   }
 
-  getTopLevelReservedTokenNoIndent(input) {
+  getTopLevelReservedTokenNoIndent(input: string): ProcessingToken {
     return this.getTokenOnFirstMatch({
       input,
       type: tokenTypes.RESERVED_TOP_LEVEL_NO_INDENT,
@@ -265,7 +332,7 @@ export default class Tokenizer {
     });
   }
 
-  getPlainReservedToken(input) {
+  getPlainReservedToken(input: string): ProcessingToken {
     return this.getTokenOnFirstMatch({
       input,
       type: tokenTypes.RESERVED,
@@ -273,7 +340,7 @@ export default class Tokenizer {
     });
   }
 
-  getWordToken(input) {
+  getWordToken(input: string): ProcessingToken {
     return this.getTokenOnFirstMatch({
       input,
       type: tokenTypes.WORD,
@@ -281,9 +348,19 @@ export default class Tokenizer {
     });
   }
 
-  getTokenOnFirstMatch({ input, type, regex }) {
+  getTokenOnFirstMatch({
+    input,
+    type,
+    regex,
+  }: {
+    input: string;
+    type: TokenTypes;
+    regex: RegExp | null;
+  }): ProcessingToken {
+    if (regex === null) return null;
+
     const matches = input.match(regex);
 
-    return matches ? { type, value: matches[1] } : undefined;
+    return matches ? { type, value: matches[1] } : null;
   }
 }

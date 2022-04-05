@@ -1,4 +1,5 @@
-import tokenTypes from "./tokenTypes";
+import type { Token } from "./token";
+import { tokenTypes } from "./tokenTypes";
 
 const INLINE_MAX_LENGTH = 50;
 
@@ -22,7 +23,7 @@ export default class InlineBlock {
    * @param  {Object[]} tokens Array of all tokens
    * @param  {Number} index Current token position
    */
-  beginIfPossible(tokens, index) {
+  beginIfPossible(tokens: Token[], index: number): void {
     if (this.level === 0 && this.isInlineBlock(tokens, index)) {
       this.level = 1;
     } else if (this.level > 0) {
@@ -50,7 +51,7 @@ export default class InlineBlock {
 
   // Check if this should be an inline parentheses block
   // Examples are "NOW()", "COUNT(*)", "int(10)", key(`somecolumn`), DECIMAL(7,2)
-  isInlineBlock(tokens, index) {
+  isInlineBlock(tokens: Token[], index: number) {
     let length = 0;
     let level = 0;
 
@@ -81,12 +82,11 @@ export default class InlineBlock {
 
   // Reserved words that cause newlines, comments and semicolons
   // are not allowed inside inline parentheses block
-  isForbiddenToken({ type, value }) {
+  isForbiddenToken(token: Token): boolean {
+    const { type, value } = token;
     return (
       type === tokenTypes.RESERVED_TOP_LEVEL ||
       type === tokenTypes.RESERVED_NEWLINE ||
-      // @ts-expect-error
-      type === tokenTypes.COMMENT ||
       type === tokenTypes.BLOCK_COMMENT ||
       value === ";"
     );

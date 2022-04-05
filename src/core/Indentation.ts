@@ -13,12 +13,12 @@ const INDENT_TYPE_BLOCK_LEVEL = "block-level";
  */
 export default class Indentation {
   indent: string;
-  indentTypes: any;
+  indentTypes: string[];
 
   /**
    * @param {String} indent Indent value, default is "  " (2 spaces)
    */
-  constructor(indent) {
+  constructor(indent?: string) {
     this.indent = indent || "  ";
     this.indentTypes = [];
   }
@@ -50,7 +50,10 @@ export default class Indentation {
    * Does nothing when the previous indent is not top-level.
    */
   decreaseTopLevel() {
-    if (this.indentTypes.length > 0 && last(this.indentTypes) === INDENT_TYPE_TOP_LEVEL) {
+    if (
+      this.indentTypes.length > 0 &&
+      last(this.indentTypes) === INDENT_TYPE_TOP_LEVEL
+    ) {
       this.indentTypes.pop();
     }
   }

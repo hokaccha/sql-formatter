@@ -1,10 +1,11 @@
 import dedent from "dedent-js";
+import type { Format } from "../helpers/types";
 
 /**
  * Tests for all the config options
  * @param {Function} format
  */
-export default function supportsConfigOptions(format) {
+export default function supportsConfigOptions(format: Format) {
   it("supports indent option", () => {
     const result = format("SELECT count(*),Column1 FROM Table1;", {
       indent: "    ",
@@ -20,7 +21,9 @@ export default function supportsConfigOptions(format) {
   });
 
   it("supports linesBetweenQueries option", () => {
-    const result = format("SELECT * FROM foo; SELECT * FROM bar;", { linesBetweenQueries: 2 });
+    const result = format("SELECT * FROM foo; SELECT * FROM bar;", {
+      linesBetweenQueries: 2,
+    });
     expect(result).toBe(dedent`
       SELECT
         *
@@ -35,9 +38,12 @@ export default function supportsConfigOptions(format) {
   });
 
   it("supports uppercase option", () => {
-    const result = format("select distinct * frOM foo left join bar WHERe cola > 1 and colb = 3", {
-      uppercase: true,
-    });
+    const result = format(
+      "select distinct * frOM foo left join bar WHERe cola > 1 and colb = 3",
+      {
+        uppercase: true,
+      }
+    );
     expect(result).toBe(dedent`
       SELECT
         DISTINCT *

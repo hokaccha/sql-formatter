@@ -335,7 +335,7 @@ const reservedTopLevelWords = [
   "CATALOG_ROLE",
 ];
 
-const reservedTopLevelWordsNoIndent = [];
+const reservedTopLevelWordsNoIndent: string[] = [];
 
 const reservedNewlineWords = [
   "AND",

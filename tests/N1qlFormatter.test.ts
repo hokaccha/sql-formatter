@@ -8,14 +8,14 @@ import supportsSchema from "./features/schema";
 import supportsStrings from "./features/strings";
 
 describe("N1qlFormatter", () => {
-  const format = (query, cfg = {}) => sqlFormatter.format(query, { ...cfg, language: "n1ql" });
+  const format = (query: string, cfg = {}) =>
+    sqlFormatter.format(query, { ...cfg, language: "n1ql" });
 
   behavesLikeSqlFormatter(format);
   supportsStrings(format, ['""', "''", "``"]);
   supportsBetween(format);
   supportsSchema(format);
   supportsOperators(format, ["%", "==", "!="]);
-  // @ts-expect-error
   supportsJoin(format, { without: ["FULL", "CROSS", "NATURAL"] });
 
   it("formats SELECT query with element selection expression", () => {
@@ -29,7 +29,9 @@ describe("N1qlFormatter", () => {
   });
 
   it("formats SELECT query with primary key querying", () => {
-    const result = format("SELECT fname, email FROM tutorial USE KEYS ['dave', 'ian'];");
+    const result = format(
+      "SELECT fname, email FROM tutorial USE KEYS ['dave', 'ian'];"
+    );
     expect(result).toBe(dedent`
       SELECT
         fname,
@@ -42,7 +44,9 @@ describe("N1qlFormatter", () => {
   });
 
   it("formats INSERT with {} object literal", () => {
-    const result = format("INSERT INTO heroes (KEY, VALUE) VALUES ('123', {'id':1,'type':'Tarzan'});");
+    const result = format(
+      "INSERT INTO heroes (KEY, VALUE) VALUES ('123', {'id':1,'type':'Tarzan'});"
+    );
     expect(result).toBe(dedent`
       INSERT INTO
         heroes (KEY, VALUE)
@@ -109,7 +113,9 @@ describe("N1qlFormatter", () => {
   });
 
   it("formats explained DELETE query with USE KEYS and RETURNING", () => {
-    const result = format("EXPLAIN DELETE FROM tutorial t USE KEYS 'baldwin' RETURNING t");
+    const result = format(
+      "EXPLAIN DELETE FROM tutorial t USE KEYS 'baldwin' RETURNING t"
+    );
     expect(result).toBe(dedent`
       EXPLAIN DELETE FROM
         tutorial t
@@ -119,7 +125,9 @@ describe("N1qlFormatter", () => {
   });
 
   it("formats UPDATE query with USE KEYS and RETURNING", () => {
-    const result = format("UPDATE tutorial USE KEYS 'baldwin' SET type = 'actor' RETURNING tutorial.type");
+    const result = format(
+      "UPDATE tutorial USE KEYS 'baldwin' SET type = 'actor' RETURNING tutorial.type"
+    );
     expect(result).toBe(dedent`
       UPDATE
         tutorial
@@ -131,7 +139,9 @@ describe("N1qlFormatter", () => {
   });
 
   it("recognizes $variables", () => {
-    const result = format("SELECT $variable, $'var name', $\"var name\", $`var name`;");
+    const result = format(
+      "SELECT $variable, $'var name', $\"var name\", $`var name`;"
+    );
     expect(result).toBe(dedent`
       SELECT
         $variable,
@@ -142,12 +152,15 @@ describe("N1qlFormatter", () => {
   });
 
   it("replaces $variables with param values", () => {
-    const result = format("SELECT $variable, $'var name', $\"var name\", $`var name`;", {
-      params: {
-        variable: '"variable value"',
-        "var name": "'var value'",
-      },
-    });
+    const result = format(
+      "SELECT $variable, $'var name', $\"var name\", $`var name`;",
+      {
+        params: {
+          variable: '"variable value"',
+          "var name": "'var value'",
+        },
+      }
+    );
     expect(result).toBe(dedent`
       SELECT
         "variable value",

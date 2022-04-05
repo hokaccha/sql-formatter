@@ -10,7 +10,8 @@ import supportsSchema from "./features/schema";
 import supportsStrings from "./features/strings";
 
 describe("Db2Formatter", () => {
-  const format = (query, cfg = {}) => sqlFormatter.format(query, { ...cfg, language: "db2" });
+  const format = (query: string, cfg = {}) =>
+    sqlFormatter.format(query, { ...cfg, language: "db2" });
 
   behavesLikeSqlFormatter(format);
   supportsCreateTable(format);
@@ -22,7 +23,11 @@ describe("Db2Formatter", () => {
   supportsJoin(format);
 
   it("formats FETCH FIRST like LIMIT", () => {
-    expect(format("SELECT col1 FROM tbl ORDER BY col2 DESC FETCH FIRST 20 ROWS ONLY;")).toBe(dedent`
+    expect(
+      format(
+        "SELECT col1 FROM tbl ORDER BY col2 DESC FETCH FIRST 20 ROWS ONLY;"
+      )
+    ).toBe(dedent`
         SELECT
           col1
         FROM

@@ -1,9 +1,14 @@
+import type { Format } from "../helpers/types";
+
 /**
  * Tests support for various string syntax
  * @param {Function} format
  * @param {String[]} stringTypes
  */
-export default function supportsStrings(format, stringTypes = []) {
+export default function supportsStrings(
+  format: Format,
+  stringTypes: string[] = []
+) {
   if (stringTypes.includes('""')) {
     it("supports double-quoted strings", () => {
       expect(format('"foo JOIN bar"')).toBe('"foo JOIN bar"');
@@ -41,7 +46,9 @@ export default function supportsStrings(format, stringTypes = []) {
 
   if (stringTypes.includes("$$")) {
     it("supports dollar-quoted strings", () => {
-      expect(format("$xxx$foo $$ LEFT JOIN $yyy$ bar$xxx$")).toBe("$xxx$foo $$ LEFT JOIN $yyy$ bar$xxx$");
+      expect(format("$xxx$foo $$ LEFT JOIN $yyy$ bar$xxx$")).toBe(
+        "$xxx$foo $$ LEFT JOIN $yyy$ bar$xxx$"
+      );
       expect(format("$$foo JOIN bar$$")).toBe("$$foo JOIN bar$$");
       expect(format("$$foo $ JOIN bar$$")).toBe("$$foo $ JOIN bar$$");
       expect(format("$$foo \n bar$$")).toBe("$$foo \n bar$$");

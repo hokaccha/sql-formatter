@@ -1,7 +1,8 @@
 import Formatter from "../core/Formatter";
 import Tokenizer from "../core/Tokenizer";
+import type { Token } from "../core/token";
 import { isBy, isSet } from "../core/token";
-import tokenTypes from "../core/tokenTypes";
+import { tokenTypes } from "../core/tokenTypes";
 
 const reservedWords = [
   "A",
@@ -390,7 +391,13 @@ const reservedTopLevelWords = [
   "WHERE",
 ];
 
-const reservedTopLevelWordsNoIndent = ["INTERSECT", "INTERSECT ALL", "MINUS", "UNION", "UNION ALL"];
+const reservedTopLevelWordsNoIndent = [
+  "INTERSECT",
+  "INTERSECT ALL",
+  "MINUS",
+  "UNION",
+  "UNION ALL",
+];
 
 const reservedNewlineWords = [
   "AND",
@@ -432,9 +439,17 @@ export default class PlSqlFormatter extends Formatter {
     });
   }
 
-  tokenOverride(token) {
-    if (isSet(token) && isBy(this.previousReservedToken)) {
-      return { type: tokenTypes.RESERVED, value: token.value };
+  tokenOverride(token: Token): Token {
+    if (
+      isSet(token) &&
+      this.previousReservedToken &&
+      isBy(this.previousReservedToken)
+    ) {
+      return {
+        type: tokenTypes.RESERVED,
+        value: token.value,
+        whitespaceBefore: "",
+      };
     }
     return token;
   }
