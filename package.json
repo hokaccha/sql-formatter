@@ -1,6 +1,6 @@
 {
   "name": "@hokaccha/sql-formatter",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Format whitespace in a SQL query to make it more readable",
   "license": "MIT",
   "main": "dist/cjs/sqlFormatter.js",
