@@ -365,12 +365,14 @@ export default class StandardSqlFormatter extends Formatter {
       reservedTopLevelWords,
       reservedNewlineWords,
       reservedTopLevelWordsNoIndent,
-      stringTypes: [`""`, "''"],
+      stringTypes: [`""`, "''", "``", "r''", 'r""', "b''", 'b""'],
       openParens: ["(", "CASE"],
       closeParens: [")", "END"],
       indexedPlaceholderTypes: ["?"],
       namedPlaceholderTypes: [],
       lineCommentTypes: ["--"],
+      specialWordChars: ["-"],
+      operators: ["||", "<<", ">>", "!="],
     });
   }
 }

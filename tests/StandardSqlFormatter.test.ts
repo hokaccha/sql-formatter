@@ -43,4 +43,76 @@ describe("StandardSqlFormatter", () => {
         2 ROWS ONLY;
     `);
   });
+
+  it("formats back quote", () => {
+    const result = format("SELECT `col` FROM `tbl` WHERE `col` = 1");
+    expect(result).toBe(dedent`
+      SELECT
+        \`col\`
+      FROM
+        \`tbl\`
+      WHERE
+        \`col\` = 1
+    `);
+  });
+
+  it("formats raw string literal", () => {
+    const result = format(
+      `SELECT col FROM tbl WHERE col = r'val' and col = r"val" and col = R'val' and col = R"val"`
+    );
+    expect(result).toBe(dedent`
+      SELECT
+        col
+      FROM
+        tbl
+      WHERE
+        col = r'val'
+        and col = r"val"
+        and col = R'val'
+        and col = R"val"
+    `);
+  });
+
+  it("formats byte literal", () => {
+    const result = format(
+      `SELECT col FROM tbl WHERE col = b'val' and col = b"val" and col = B'val' and col = B"val"`
+    );
+    expect(result).toBe(dedent`
+      SELECT
+        col
+      FROM
+        tbl
+      WHERE
+        col = b'val'
+        and col = b"val"
+        and col = B'val'
+        and col = B"val"
+    `);
+  });
+
+  it("formats hyphen", () => {
+    const result = format("SELECT * FROM schema-name.tbl");
+    expect(result).toBe(dedent`
+      SELECT
+        *
+      FROM
+        schema-name.tbl
+    `);
+  });
+
+  it("formats operators", () => {
+    const result = format(
+      "SELECT a << 1, b >> 2, c || d FROM tbl WHERE col != 1"
+    );
+    expect(result).toBe(dedent`
+      SELECT
+        a << 1,
+        b >> 2,
+        c || d
+      FROM
+        tbl
+      WHERE
+        col != 1
+    `);
+  });
 });

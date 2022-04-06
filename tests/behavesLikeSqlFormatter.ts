@@ -11,18 +11,7 @@ import type { Format } from "./helpers/types";
 export default function behavesLikeSqlFormatter(format: Format) {
   supportsComments(format);
   supportsConfigOptions(format);
-  supportsOperators(format, [
-    "=",
-    "+",
-    "-",
-    "*",
-    "/",
-    "<>",
-    ">",
-    "<",
-    ">=",
-    "<=",
-  ]);
+  supportsOperators(format, ["=", "+", "*", "/", "<>", ">", "<", ">=", "<="]);
 
   it("does nothing with empty input", () => {
     const result = format("");
@@ -444,6 +433,14 @@ export default function behavesLikeSqlFormatter(format: Format) {
         *
       FROM
         tbl2;
+    `);
+  });
+
+  it("formats false", () => {
+    const result = format("SELECT false");
+    expect(result).toBe(dedent`
+      SELECT
+        false
     `);
   });
 }
