@@ -12,7 +12,7 @@
     "src/"
   ],
   "scripts": {
-    "build": "tsc && tsc --module commonjs --outDir 'dist/cjs'",
+    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.build.json --module commonjs --outDir 'dist/cjs'",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run clean && npm run build",
     "lint": "run-p -l -c --aggregate-output lint:*",
