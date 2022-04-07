@@ -53,5 +53,3 @@ export const format = (query: string, config: FormatConfig = {}) => {
 
   return new Formatter(formatterConfig).format(query);
 };
-
-export const supportedDialects = Object.keys(formatters);
