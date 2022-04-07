@@ -11,8 +11,8 @@ import supportsSchema from "./features/schema";
 import supportsStrings from "./features/strings";
 
 describe("TSqlFormatter", () => {
-  const format = (query: string, cfg = {}) =>
-    sqlFormatter.format(query, { ...cfg, language: "tsql" });
+  const format = (query: string, config = {}) =>
+    sqlFormatter.format(query, { ...config, language: "tsql" });
 
   behavesLikeSqlFormatter(format);
   supportsCase(format);

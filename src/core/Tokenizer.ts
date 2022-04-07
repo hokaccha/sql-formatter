@@ -39,22 +39,7 @@ export default class Tokenizer {
   IDENT_NAMED_PLACEHOLDER_REGEX: RegExp | null;
   STRING_NAMED_PLACEHOLDER_REGEX: RegExp | null;
 
-  /**
-   * @param {Object} cfg
-   *  @param {String[]} cfg.reservedWords Reserved words in SQL
-   *  @param {String[]} cfg.reservedTopLevelWords Words that are set to new line separately
-   *  @param {String[]} cfg.reservedNewlineWords Words that are set to newline
-   *  @param {String[]} cfg.reservedTopLevelWordsNoIndent Words that are top level but have no indentation
-   *  @param {String[]} cfg.stringTypes String types to enable: "", '', ``, [], N''
-   *  @param {String[]} cfg.openParens Opening parentheses to enable, like (, [
-   *  @param {String[]} cfg.closeParens Closing parentheses to enable, like ), ]
-   *  @param {String[]} cfg.indexedPlaceholderTypes Prefixes for indexed placeholders, like ?
-   *  @param {String[]} cfg.namedPlaceholderTypes Prefixes for named placeholders, like @ and :
-   *  @param {String[]} cfg.lineCommentTypes Line comments to enable, like # and --
-   *  @param {String[]} cfg.specialWordChars Special chars that can be found inside of words, like @ and #
-   *  @param {String[]} [cfg.operator] Additional operators to recognize
-   */
-  constructor(cfg: TokenizerConfig) {
+  constructor(config: TokenizerConfig) {
     this.WHITESPACE_REGEX = /^(\s+)/u;
     this.NUMBER_REGEX =
       /^((-\s*)?[0-9]+(\.[0-9]+)?([eE]-?[0-9]+(\.[0-9]+)?)?|0x[0-9a-fA-F]+|0b[01]+)\b/u;
@@ -63,47 +48,51 @@ export default class Tokenizer {
       "<>",
       "<=",
       ">=",
-      ...(cfg.operators || []),
+      ...(config.operators || []),
     ]);
 
     this.BLOCK_COMMENT_REGEX = /^(\/\*[^]*?(?:\*\/|$))/u;
     this.LINE_COMMENT_REGEX = regexFactory.createLineCommentRegex(
-      cfg.lineCommentTypes || []
+      config.lineCommentTypes || []
     );
 
     this.RESERVED_TOP_LEVEL_REGEX = regexFactory.createReservedWordRegex(
-      cfg.reservedTopLevelWords || []
+      config.reservedTopLevelWords || []
     );
     this.RESERVED_TOP_LEVEL_NO_INDENT_REGEX =
       regexFactory.createReservedWordRegex(
-        cfg.reservedTopLevelWordsNoIndent || []
+        config.reservedTopLevelWordsNoIndent || []
       );
     this.RESERVED_NEWLINE_REGEX = regexFactory.createReservedWordRegex(
-      cfg.reservedNewlineWords || []
+      config.reservedNewlineWords || []
     );
     this.RESERVED_PLAIN_REGEX = regexFactory.createReservedWordRegex(
-      cfg.reservedWords || []
+      config.reservedWords || []
     );
 
-    this.WORD_REGEX = regexFactory.createWordRegex(cfg.specialWordChars);
-    this.STRING_REGEX = regexFactory.createStringRegex(cfg.stringTypes || []);
+    this.WORD_REGEX = regexFactory.createWordRegex(config.specialWordChars);
+    this.STRING_REGEX = regexFactory.createStringRegex(
+      config.stringTypes || []
+    );
 
-    this.OPEN_PAREN_REGEX = regexFactory.createParenRegex(cfg.openParens || []);
+    this.OPEN_PAREN_REGEX = regexFactory.createParenRegex(
+      config.openParens || []
+    );
     this.CLOSE_PAREN_REGEX = regexFactory.createParenRegex(
-      cfg.closeParens || []
+      config.closeParens || []
     );
 
     this.INDEXED_PLACEHOLDER_REGEX = regexFactory.createPlaceholderRegex(
-      cfg.indexedPlaceholderTypes || [],
+      config.indexedPlaceholderTypes || [],
       "[0-9]*"
     );
     this.IDENT_NAMED_PLACEHOLDER_REGEX = regexFactory.createPlaceholderRegex(
-      cfg.namedPlaceholderTypes || [],
+      config.namedPlaceholderTypes || [],
       "[a-zA-Z0-9._$]+"
     );
     this.STRING_NAMED_PLACEHOLDER_REGEX = regexFactory.createPlaceholderRegex(
-      cfg.namedPlaceholderTypes || [],
-      regexFactory.createStringPattern(cfg.stringTypes || [])
+      config.namedPlaceholderTypes || [],
+      regexFactory.createStringPattern(config.stringTypes || [])
     );
   }
 

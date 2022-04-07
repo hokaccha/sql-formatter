@@ -16,7 +16,7 @@ export type FormatterConfig = {
 };
 
 export default class Formatter {
-  cfg: FormatterConfig;
+  config: FormatterConfig;
   indentation: Indentation;
   inlineBlock: InlineBlock;
   params: Params;
@@ -24,11 +24,11 @@ export default class Formatter {
   tokens: Token[];
   index: number;
 
-  constructor(cfg: FormatterConfig) {
-    this.cfg = cfg;
-    this.indentation = new Indentation(this.cfg.indent);
+  constructor(config: FormatterConfig) {
+    this.config = config;
+    this.indentation = new Indentation(this.config.indent);
     this.inlineBlock = new InlineBlock();
-    this.params = new Params(this.cfg.params);
+    this.params = new Params(this.config.params);
     this.previousReservedToken = null;
     this.tokens = [];
     this.index = 0;
@@ -239,7 +239,7 @@ export default class Formatter {
     return (
       trimSpacesEnd(query) +
       this.show(token) +
-      "\n".repeat(this.cfg.linesBetweenQueries)
+      "\n".repeat(this.config.linesBetweenQueries)
     );
   }
 
@@ -258,7 +258,7 @@ export default class Formatter {
       return value;
     }
 
-    switch (this.cfg.keywordCase) {
+    switch (this.config.keywordCase) {
       case "lower":
         return value.toLowerCase();
       case "upper":

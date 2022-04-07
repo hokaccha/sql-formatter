@@ -8,8 +8,8 @@ import supportsSchema from "./features/schema";
 import supportsStrings from "./features/strings";
 
 describe("N1qlFormatter", () => {
-  const format = (query: string, cfg = {}) =>
-    sqlFormatter.format(query, { ...cfg, language: "n1ql" });
+  const format = (query: string, config = {}) =>
+    sqlFormatter.format(query, { ...config, language: "n1ql" });
 
   behavesLikeSqlFormatter(format);
   supportsStrings(format, ['""', "''", "``"]);

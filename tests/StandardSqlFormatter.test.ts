@@ -10,8 +10,8 @@ import supportsSchema from "./features/schema";
 import supportsStrings from "./features/strings";
 
 describe("StandardSqlFormatter", () => {
-  const format = (query: string, cfg = {}) =>
-    sqlFormatter.format(query, { ...cfg, language: "sql" });
+  const format = (query: string, config = {}) =>
+    sqlFormatter.format(query, { ...config, language: "sql" });
 
   behavesLikeSqlFormatter(format);
   supportsCase(format);

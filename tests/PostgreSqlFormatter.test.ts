@@ -11,8 +11,8 @@ import supportsSchema from "./features/schema";
 import supportsStrings from "./features/strings";
 
 describe("PostgreSqlFormatter", () => {
-  const format = (query: string, cfg = {}) =>
-    sqlFormatter.format(query, { ...cfg, language: "postgresql" });
+  const format = (query: string, config = {}) =>
+    sqlFormatter.format(query, { ...config, language: "postgresql" });
 
   behavesLikeSqlFormatter(format);
   supportsCase(format);

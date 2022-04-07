@@ -12,8 +12,8 @@ import supportsSchema from "./features/schema";
 import supportsStrings from "./features/strings";
 
 describe("PlSqlFormatter", () => {
-  const format = (query: string, cfg = {}) =>
-    sqlFormatter.format(query, { ...cfg, language: "plsql" });
+  const format = (query: string, config = {}) =>
+    sqlFormatter.format(query, { ...config, language: "plsql" });
 
   behavesLikeSqlFormatter(format);
   supportsCase(format);
