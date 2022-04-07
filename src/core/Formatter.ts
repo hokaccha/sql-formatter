@@ -8,9 +8,11 @@ import type { Token } from "./token";
 import { isAnd, isBetween, isLimit } from "./token";
 import { tokenTypes } from "./tokenTypes";
 
+export type KeywordCase = "upper" | "lower" | "preserve";
+
 export type FormatterConfig = {
   indent: string;
-  keywordCase: "upper" | "lower" | "preserve";
+  keywordCase: KeywordCase;
   linesBetweenQueries: number;
   params?: PlaceholderParams;
 };

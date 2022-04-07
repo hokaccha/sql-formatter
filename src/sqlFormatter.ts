@@ -1,4 +1,5 @@
-import type { FormatterConfig } from "./core/Formatter";
+import type { KeywordCase } from "./core/Formatter";
+import type { PlaceholderParams } from "./core/Params";
 import Db2Formatter from "./languages/Db2Formatter";
 import MariaDbFormatter from "./languages/MariaDbFormatter";
 import MySqlFormatter from "./languages/MySqlFormatter";
@@ -23,15 +24,21 @@ const formatters = {
   tsql: TSqlFormatter,
 } as const;
 
-type Language = keyof typeof formatters;
-
-export type FormatConfig = Partial<FormatterConfig> & { language?: Language };
-
-const defaultConfig: FormatterConfig & { language: Language } = {
+const defaultConfig = {
   language: "sql",
   indent: "  ",
   keywordCase: "preserve",
   linesBetweenQueries: 1,
+} as const;
+
+export type Language = keyof typeof formatters;
+export { KeywordCase };
+export type FormatConfig = {
+  language?: Language;
+  indent?: string;
+  keywordCase?: KeywordCase;
+  linesBetweenQueries?: number;
+  params?: PlaceholderParams;
 };
 
 /**
