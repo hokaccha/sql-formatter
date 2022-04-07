@@ -115,4 +115,27 @@ describe("StandardSqlFormatter", () => {
         col != 1
     `);
   });
+
+  it("formats array", () => {
+    const result = format(
+      "SELECT * FROM UNNEST(['foo', 'bar', 'baz', 'qux', 'corge', 'garply', 'waldo', 'fred'])"
+    );
+    expect(result).toBe(dedent`
+      SELECT
+        *
+      FROM
+        UNNEST(
+          [
+            'foo',
+            'bar',
+            'baz',
+            'qux',
+            'corge',
+            'garply',
+            'waldo',
+            'fred'
+          ]
+        )
+    `);
+  });
 });
