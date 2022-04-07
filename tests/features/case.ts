@@ -84,7 +84,7 @@ export default function supportsCase(format: Format) {
   it("properly converts to uppercase in case statements", () => {
     const result = format(
       "case toString(getNumber()) when 'one' then 1 when 'two' then 2 when 'three' then 3 else 4 end;",
-      { uppercase: true }
+      { keywordCase: "upper" }
     );
     expect(result).toBe(dedent`
       CASE

@@ -8,10 +8,10 @@ import type { Token } from "./token";
 import { isAnd, isBetween, isLimit } from "./token";
 import { tokenTypes } from "./tokenTypes";
 
-type FormatterConfig = {
-  indent?: string;
-  uppercase?: boolean;
-  linesBetweenQueries?: number;
+export type FormatterConfig = {
+  indent: string;
+  keywordCase: "upper" | "lower" | "preserve";
+  linesBetweenQueries: number;
   params?: PlaceholderParams;
 };
 
@@ -24,13 +24,6 @@ export default class Formatter {
   tokens: Token[];
   index: number;
 
-  /**
-   * @param {Object} cfg
-   *  @param {String} cfg.indent
-   *  @param {Boolean} cfg.uppercase
-   *  @param {Integer} cfg.linesBetweenQueries
-   *  @param {Object} cfg.params
-   */
   constructor(cfg: FormatterConfig) {
     this.cfg = cfg;
     this.indentation = new Indentation(this.cfg.indent);
@@ -246,25 +239,34 @@ export default class Formatter {
     return (
       trimSpacesEnd(query) +
       this.show(token) +
-      "\n".repeat(this.cfg.linesBetweenQueries || 1)
+      "\n".repeat(this.cfg.linesBetweenQueries)
     );
   }
 
-  // Converts token to string (uppercasing it if needed)
+  // Converts token to string
   show(token: Token): string {
     const { type, value } = token;
-    if (
-      this.cfg.uppercase &&
-      (type === tokenTypes.RESERVED ||
-        type === tokenTypes.RESERVED_TOP_LEVEL ||
-        type === tokenTypes.RESERVED_TOP_LEVEL_NO_INDENT ||
-        type === tokenTypes.RESERVED_NEWLINE ||
-        type === tokenTypes.OPEN_PAREN ||
-        type === tokenTypes.CLOSE_PAREN)
-    ) {
-      return value.toUpperCase();
-    } else {
+    const isKeyword =
+      type === tokenTypes.RESERVED ||
+      type === tokenTypes.RESERVED_TOP_LEVEL ||
+      type === tokenTypes.RESERVED_TOP_LEVEL_NO_INDENT ||
+      type === tokenTypes.RESERVED_NEWLINE ||
+      type === tokenTypes.OPEN_PAREN ||
+      type === tokenTypes.CLOSE_PAREN;
+
+    if (isKeyword === false) {
       return value;
+    }
+
+    switch (this.cfg.keywordCase) {
+      case "lower":
+        return value.toLowerCase();
+      case "upper":
+        return value.toUpperCase();
+      case "preserve":
+        return value;
+      default:
+        return value;
     }
   }
 

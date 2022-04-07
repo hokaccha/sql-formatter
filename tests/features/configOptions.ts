@@ -37,11 +37,11 @@ export default function supportsConfigOptions(format: Format) {
     `);
   });
 
-  it("supports uppercase option", () => {
+  it("supports keywordCase option (upper)", () => {
     const result = format(
       "select distinct * frOM foo left join bar WHERe cola > 1 and colb = 3",
       {
-        uppercase: true,
+        keywordCase: "upper",
       }
     );
     expect(result).toBe(dedent`
@@ -53,6 +53,44 @@ export default function supportsConfigOptions(format: Format) {
       WHERE
         cola > 1
         AND colb = 3
+    `);
+  });
+
+  it("supports keywordCase option (lower)", () => {
+    const result = format(
+      "select distinct * frOM foo left join bar WHERe cola > 1 and colb = 3",
+      {
+        keywordCase: "lower",
+      }
+    );
+    expect(result).toBe(dedent`
+      select
+        distinct *
+      from
+        foo
+        left join bar
+      where
+        cola > 1
+        and colb = 3
+    `);
+  });
+
+  it("supports keywordCase option (preserve)", () => {
+    const result = format(
+      "select distinct * frOM foo left join bar WHERe cola > 1 and colb = 3",
+      {
+        keywordCase: "preserve",
+      }
+    );
+    expect(result).toBe(dedent`
+      select
+        distinct *
+      frOM
+        foo
+        left join bar
+      WHERe
+        cola > 1
+        and colb = 3
     `);
   });
 }

@@ -1,4 +1,4 @@
-import type { PlaceholderParams } from "./core/Params";
+import type { FormatterConfig } from "./core/Formatter";
 import Db2Formatter from "./languages/Db2Formatter";
 import MariaDbFormatter from "./languages/MariaDbFormatter";
 import MySqlFormatter from "./languages/MySqlFormatter";
@@ -9,8 +9,6 @@ import RedshiftFormatter from "./languages/RedshiftFormatter";
 import SparkSqlFormatter from "./languages/SparkSqlFormatter";
 import StandardSqlFormatter from "./languages/StandardSqlFormatter";
 import TSqlFormatter from "./languages/TSqlFormatter";
-
-const DEFAULT_LANGUAGE = "sql";
 
 const formatters = {
   db2: Db2Formatter,
@@ -25,25 +23,19 @@ const formatters = {
   tsql: TSqlFormatter,
 } as const;
 
-export type FormatConfig = {
-  language?: keyof typeof formatters;
-  indent?: string;
-  uppercase?: boolean;
-  linesBetweenQueries?: number;
-  params?: PlaceholderParams;
+type Language = keyof typeof formatters;
+
+export type FormatConfig = Partial<FormatterConfig> & { language?: Language };
+
+const defaultConfig: FormatterConfig & { language: Language } = {
+  language: "sql",
+  indent: "  ",
+  keywordCase: "preserve",
+  linesBetweenQueries: 1,
 };
 
 /**
  * Format whitespace in a query to make it easier to read.
- *
- * @param {String} query
- * @param {Object} cfg
- *  @param {String} cfg.language Query language, default is Standard SQL
- *  @param {String} cfg.indent Characters used for indentation, default is "  " (2 spaces)
- *  @param {Boolean} cfg.uppercase Converts keywords to uppercase
- *  @param {Integer} cfg.linesBetweenQueries How many line breaks between queries
- *  @param {Object} cfg.params Collection of params for placeholder replacement
- * @return {String}
  */
 export const format = (query: string, config: FormatConfig = {}) => {
   if (typeof query !== "string") {
@@ -52,11 +44,13 @@ export const format = (query: string, config: FormatConfig = {}) => {
     );
   }
 
-  const { language, ...formatterConfig } = config;
-  const Formatter = formatters[language || DEFAULT_LANGUAGE];
+  const { language, ...formatterConfig } = { ...defaultConfig, ...config };
+
+  const Formatter = formatters[language];
   if (Formatter === undefined) {
     throw Error(`Unsupported SQL dialect: ${language}`);
   }
+
   return new Formatter(formatterConfig).format(query);
 };
 
