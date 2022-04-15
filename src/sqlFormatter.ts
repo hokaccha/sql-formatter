@@ -1,5 +1,6 @@
 import type { KeywordCase } from "./core/Formatter";
 import type { PlaceholderParams } from "./core/Params";
+import BigQueryFormatter from "./languages/BigQueryFormatter";
 import Db2Formatter from "./languages/Db2Formatter";
 import MariaDbFormatter from "./languages/MariaDbFormatter";
 import MySqlFormatter from "./languages/MySqlFormatter";
@@ -22,6 +23,7 @@ const formatters = {
   spark: SparkSqlFormatter,
   sql: StandardSqlFormatter,
   tsql: TSqlFormatter,
+  bigquery: BigQueryFormatter,
 } as const;
 
 const defaultConfig = {
