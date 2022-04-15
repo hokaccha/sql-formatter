@@ -183,6 +183,7 @@ const reservedWords = [
   "OCTET_LENGTH",
   "OCCURRENCES_REGEX",
   "OF",
+  "OFFSET",
   "OLD",
   "ON",
   "ONLY",
