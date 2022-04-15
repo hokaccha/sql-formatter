@@ -78,23 +78,6 @@ describe("RedshiftFormatter", () => {
     `);
   });
 
-  it.skip("formats DISTKEY and SORTKEY after CREATE TABLE", () => {
-    expect(
-      format(
-        "CREATE TABLE items (a INT PRIMARY KEY, b TEXT, c INT NOT NULL, d INT NOT NULL) DISTKEY(created_at) SORTKEY(created_at);"
-      )
-    ).toBe(dedent`
-      CREATE TABLE items (
-        a INT PRIMARY KEY,
-        b TEXT,
-        c INT NOT NULL,
-        d INT NOT NULL
-      )
-      DISTKEY(created_at)
-      SORTKEY(created_at);
-    `);
-  });
-
   it("formats COPY", () => {
     expect(
       format(
