@@ -18,10 +18,10 @@
     "lint": "run-p -l -c --aggregate-output lint:*",
     "lint:tsc": "tsc --noEmit",
     "lint:eslint": "eslint . --max-warnings 0",
-    "lint:prettier": "prettier --check .",
+    "lint:prettier": "prettier --check '**/*.{ts,js}'",
     "format": "run-s format:*",
     "format:eslint": "eslint --fix .",
-    "format:prettier": "prettier --write .",
+    "format:prettier": "prettier --write '**/*.{ts,js}'",
     "test": "jest"
   },
   "devDependencies": {
