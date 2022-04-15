@@ -348,7 +348,6 @@ const reservedTopLevelWordsNoIndent = [
   "UNION",
   "UNION ALL",
   "UNION DISTINCT",
-  "EXCEPT",
   "EXCEPT ALL",
   "EXCEPT DISTINCT",
 ];

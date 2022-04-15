@@ -138,4 +138,15 @@ describe("StandardSqlFormatter", () => {
         )
     `);
   });
+
+  it("formats * except()", () => {
+    const result = format("SELECT * except(foo),bar FROM tbl");
+    expect(result).toBe(dedent`
+      SELECT
+        * except(foo),
+        bar
+      FROM
+        tbl
+    `);
+  });
 });
