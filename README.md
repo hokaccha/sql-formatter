@@ -17,6 +17,7 @@ SQL formatter supports the following dialects:
 - **redshift** - [Amazon Redshift](https://docs.aws.amazon.com/redshift/latest/dg/cm_chap_SQLCommandRef.html)
 - **spark** - [Spark](https://spark.apache.org/docs/latest/api/sql/index.html)
 - **tsql** - [SQL Server Transact-SQL](https://docs.microsoft.com/en-us/sql/sql-server/)
+- **bigquery** - [Google BigQuery](https://cloud.google.com/bigquery/docs/reference/standard-sql/introduction)
 
 It does not support:
 
