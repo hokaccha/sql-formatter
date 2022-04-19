@@ -266,6 +266,7 @@ const reservedTopLevelWords = [
   "LIMIT",
   "ORDER BY",
   "SELECT",
+  "SELECT DISTINCT",
   "SET",
   "UPDATE",
   "VALUES",

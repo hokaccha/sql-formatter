@@ -45,8 +45,8 @@ export default function supportsConfigOptions(format: Format) {
       }
     );
     expect(result).toBe(dedent`
-      SELECT
-        DISTINCT *
+      SELECT DISTINCT
+        *
       FROM
         foo
         LEFT JOIN bar
@@ -64,8 +64,8 @@ export default function supportsConfigOptions(format: Format) {
       }
     );
     expect(result).toBe(dedent`
-      select
-        distinct *
+      select distinct
+        *
       from
         foo
         left join bar
@@ -83,8 +83,8 @@ export default function supportsConfigOptions(format: Format) {
       }
     );
     expect(result).toBe(dedent`
-      select
-        distinct *
+      select distinct
+        *
       frOM
         foo
         left join bar

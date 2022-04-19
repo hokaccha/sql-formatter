@@ -193,6 +193,7 @@ const reservedTopLevelWords = [
   "ORDER BY",
   "PREPARE",
   "SELECT",
+  "SELECT DISTINCT",
   "SET CURRENT SCHEMA",
   "SET SCHEMA",
   "SET",

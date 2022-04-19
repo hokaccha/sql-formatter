@@ -173,6 +173,7 @@ const reservedTopLevelWords = [
   "RANGE",
   "ROWS",
   "SELECT",
+  "SELECT DISTINCT",
   "SET CURRENT SCHEMA",
   "SET SCHEMA",
   "SET",

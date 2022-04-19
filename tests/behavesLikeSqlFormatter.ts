@@ -46,8 +46,8 @@ export default function behavesLikeSqlFormatter(format: Format) {
       "SELECT DISTINCT name, ROUND(age/7) field1, 18 + 20 AS field2, 'some string' FROM foo;"
     );
     expect(result).toBe(dedent`
-      SELECT
-        DISTINCT name,
+      SELECT DISTINCT
+        name,
         ROUND(age / 7) field1,
         18 + 20 AS field2,
         'some string'
@@ -138,8 +138,8 @@ export default function behavesLikeSqlFormatter(format: Format) {
   it("preserves case of keywords", () => {
     const result = format("select distinct * frOM foo WHERe a > 1 and b = 3");
     expect(result).toBe(dedent`
-      select
-        distinct *
+      select distinct
+        *
       frOM
         foo
       WHERe
